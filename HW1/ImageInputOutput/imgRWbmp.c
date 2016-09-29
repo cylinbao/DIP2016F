@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "bmp.h"
+#include "../bmp.h"
 
 #define inNum 2
 #define inNameLen 14
