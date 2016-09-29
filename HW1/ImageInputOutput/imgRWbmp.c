@@ -8,17 +8,17 @@
 
 char inNames[inNum][inNameLen] = {"../input1.bmp", "../input2.bmp"};
 char outNames[outNum][outNameLen] = {"output1.bmp", "output2.bmp"};
-bmp files[outNum];
+bmp imgs[outNum];
 
 int main()
 {
 	int i;
 
 	for(i = 0; i < inNum; i++)
-		bmpRead(inNames[i], &files[i]);
+		bmpRead(inNames[i], &imgs[i]);
 
 	for(i = 0; i < outNum; i++)
-		bmpWrite(outNames[i], &files[i]);
+		bmpWrite(outNames[i], &imgs[i]);
 
 	return 0;
 }

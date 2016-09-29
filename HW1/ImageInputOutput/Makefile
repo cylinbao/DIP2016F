@@ -1,6 +1,6 @@
 CC = gcc
 TARGET = imgRWbmp
-OUTFILES = output1.bmp output2.bmp
+OUTFILES = ./*bmp
 
 imgRWbmp: imgRWbmp.c
 	$(CC) $< -o $@
