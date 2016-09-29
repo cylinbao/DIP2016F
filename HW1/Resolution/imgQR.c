@@ -11,23 +11,20 @@ char outNames[inNum][outNum][outNameLen] = {
 		 	"output1_1.bmp", "output1_2.bmp", "output1_3.bmp",
 		 	"output2_1.bmp", "output2_2.bmp", "output2_3.bmp"
 		 };
-bmp imgs[inNum * outNum];
+
+bmp imgs[inNum][outNum];
 
 int main()
 {
 	int i, j;
 
-	for(i = 0; i < inNum; i++)
-		for(j = 0; j < outNum; j++)
-			bmpRead(inNames[i], &imgs[i*outNum + j]);
-
-	for(i = 0; i < inNum; i++)
-		for(j = 0; j < outNum; j++)
-			bmpDownRes(&imgs[i*outNum + j], j);
-
-	for(i = 0; i < inNum; i++)
-		for(j = 0; j < outNum; j++)
-		bmpWrite(outNames[i][j], &imgs[i*outNum + j]);
+	for(i = 0; i < inNum; i++){
+		for(j = 0; j < outNum; j++){
+			bmpRead(inNames[i], &imgs[i][j]);
+			bmpDownRes(&imgs[i][j], j);
+			bmpWrite(outNames[i][j], &imgs[i][j]);
+		}
+	}
 
 	return 0;
 }
