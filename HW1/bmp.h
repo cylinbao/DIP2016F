@@ -29,7 +29,67 @@ typedef struct bmp{
 	BYTE *data;
 } bmp;
 
+void setPixel(int bytePP, BYTE *src, BYTE *des){
+	int i;
+
+	for(i = 0; i < bytePP; i++)
+		des[i] = src[i];
+}
+
+int getIdx(int x, int y, int width){
+	return y*width+x;
+}
+
 void bmpDownRes(bmp *img, int scale){
+	int i;
+	BYTE temp, mask;
+
+	switch(scale){
+		case 0:
+			mask = 0b11111100;
+			break;
+		case 1:
+			mask = 0b11110000;
+			break;
+		case 2:
+			mask = 0b11000000;
+			break;
+	}
+
+	for(i = 0; i < img->dataSize; i++)
+		img->data[i] = img->data[i] & mask;
+}
+
+
+void bmpScaleUp(bmp *img){
+	int i, j, k, bytePP; 
+	int oriIdx, newIdx;
+	UINT32 newDataSize = img->dataSize*4;
+	UINT32 newWidth = img->width*2;
+	UINT32 newHeight = img->height*2;
+
+	BYTE *newData = malloc(newDataSize);
+
+	bytePP = img->bitPerPixel / 8;
+
+	for(i = 0; i < newHeight; i++){
+		for(j = 0; j < newWidth; j++){
+			if((j+1)%2 == 0 && (i+1)%2 == 0){
+				oriIdx = getIdx((j-1)/2, (i-1)/2, img->width);
+				newIdx = getIdx(j, i, newWidth);
+				setPixel(bytePP, &img->data[oriIdx*bytePP], &newData[newIdx*bytePP]);
+			}
+		}
+	}
+
+	free(img->data);
+	img->data = newData;
+	img->dataSize = newDataSize;
+	img->width = newWidth;
+	img->height = newHeight;
+}
+
+void bmpScaleDown(bmp *img){
 
 }
 
