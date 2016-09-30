@@ -62,6 +62,8 @@ void bmpDownRes(bmp *img, int scale){
 
 
 void bmpScaleUp(bmp *img){
+	printf("Scaling up image\n");
+
 	int i, j, k, bytePP; 
 	int oriIdx, newIdx;
 	UINT32 newDataSize = img->dataSize*4;
@@ -90,7 +92,34 @@ void bmpScaleUp(bmp *img){
 }
 
 void bmpScaleDown(bmp *img){
+	printf("Scaling down image\n");
 
+	int i, j, k, bytePP; 
+	int oriIdx, newIdx;
+	UINT32 newWidth = img->width/2;
+	UINT32 newHeight = img->height/2;
+	UINT32 newDataSize;
+	printf("newWidth = %d, newHeight = %d\n", newWidth, newHeight);
+
+	bytePP = img->bitPerPixel / 8;
+	newDataSize = newWidth * newHeight * bytePP;
+	BYTE *newData = malloc(newDataSize);
+
+
+	for(i = 0; i < newHeight; i++){
+		for(j = 0; j < newWidth; j++){
+			//printf("j = %d, i = %d\n", j , i);
+			oriIdx = getIdx(j*2, i*2, img->width);
+			newIdx = getIdx(j, i, newWidth);
+			setPixel(bytePP, &img->data[oriIdx*bytePP], &newData[newIdx*bytePP]);
+		}
+	}
+
+	free(img->data);
+	img->data = newData;
+	img->dataSize = newDataSize;
+	img->width = newWidth;
+	img->height = newHeight;
 }
 
 void bmpRead(char *filename, bmp *img){
