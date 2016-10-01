@@ -82,7 +82,7 @@ void scaleRep(BYTE *srcData, index *srcIdx, BYTE *desData, index *desIdx){
 	tmpPix = getPixel(srcIdx, srcData);
 	setPixel(tmpPix, desIdx, desData);
 }
-
+/*
 void scaleLiInt(BYTE *srcData, index *srcIdx1, index *srcIdx2, 
 								BYTE *desData, index *desIdx){
 	pixel *pix1, *pix2; 
@@ -101,10 +101,28 @@ void scaleLiInt(BYTE *srcData, index *srcIdx1, index *srcIdx2,
 
 	setPixel(tmpPix, desIdx, desData);
 }
+*/
+void scaleLiInt(pixel *srcPix1, pixel *srcPix2, pixel *desPix, index *idx, BYTE *data){
+	desPix->bytePP = srcPix1->bytePP;
+	desPix->b = (srcPix1->b + srcPix2->b)/2;
+	desPix->g = (srcPix1->g + srcPix2->g)/2;
+	desPix->r = (srcPix1->r + srcPix2->r)/2;
+	if(desPix->bytePP > 3)
+		desPix->a = (srcPix1->a + srcPix2->a)/2;
 
-void scaleBiliInt(BYTE *srcData, index *srcIdx1, index *srcIdx2, index *srcIdx3, 
-									index *srcIdx4, BYTE *desData, index *desIdx){
+	setPixel(desPix, idx, data);
+}
 
+void scaleBiliInt(pixel *srcPix1, pixel *srcPix2, pixel *srcPix3, pixel *srcPix4,
+									pixel *desPix, index *idx, BYTE *data){
+	desPix->bytePP = srcPix1->bytePP;
+	desPix->b = (srcPix1->b + srcPix2->b + srcPix3->b + srcPix4->b)/2;
+	desPix->g = (srcPix1->g + srcPix2->g + srcPix3->g + srcPix4->g)/2;
+	desPix->r = (srcPix1->r + srcPix2->r + srcPix3->r + srcPix4->r)/2;
+	if(desPix->bytePP > 3)
+		desPix->a = (srcPix1->a + srcPix2->a + srcPix3->a + srcPix4->a)/2;
+
+	setPixel(desPix, idx, data);
 }
 
 void bmpScaleUp(bmp *img){
@@ -117,6 +135,7 @@ void bmpScaleUp(bmp *img){
 	UINT32 newHeight = img->height*2;
 	index srcIdx1, srcIdx2, srcIdx3, srcIdx4;
 	index desIdx;
+	pixel *srcPix1, *srcPix2, *srcPix3, *srcPix4, *desPix;
 
 	BYTE *newData = malloc(newDataSize);
 
@@ -125,40 +144,98 @@ void bmpScaleUp(bmp *img){
 	for(i = 0; i < newHeight; i++){
 		for(j = 0; j < newWidth; j++){
 			if((j+1)%2 == 0 && (i+1)%2 == 0){
-				srcIdx1.x = (j-1)/2; srcIdx1.y = (i-1)/2;
+				srcIdx1.x = j/2; srcIdx1.y = i/2;
 				srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
 				desIdx.x = j; desIdx.y = i; 
 				desIdx.width = newWidth; desIdx.bytePP = bytePP;
 
 				scaleRep(img->data, &srcIdx1, newData, &desIdx);
 			}
-			else if((j+1)%2 == 0) {
-				if(i > 1){
-					srcIdx1.x = (j-1)/2; srcIdx1.y = (i-2)/2;
-					srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
-					srcIdx2.x = (j-1)/2; srcIdx2.y = i/2;
-					srcIdx2.width = img->width; srcIdx2.bytePP = bytePP;
+			else if((j+1)%2 == 0){
+				srcIdx1.x = j/2; 
+				if(i > 1)
+					srcIdx1.y = (i-1)/2;
+				else
+					srcIdx1.y = 0;
 
-					desIdx.x = j; desIdx.y = i; 
-					desIdx.width = newWidth; desIdx.bytePP = bytePP;
+				srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
+				srcPix1 = getPixel(&srcIdx1, img->data);
 
-					scaleLiInt(img->data, &srcIdx1, &srcIdx2, newData, &desIdx);
-				}
+				srcIdx2.x = j/2; srcIdx2.y = (i+1)/2;
+				srcIdx2.width = img->width; srcIdx2.bytePP = bytePP;
+				srcPix2 = getPixel(&srcIdx2, img->data);
+
+				desIdx.x = j; desIdx.y = i; 
+				desIdx.width = newWidth; desIdx.bytePP = bytePP;
+				desPix = getPixel(&desIdx, newData);
+
+				scaleLiInt(srcPix1, srcPix2, desPix, &desIdx, newData);
 			}
 			else if((i+1)%2 == 0){
-				if(j > 1){
-					srcIdx1.x = (j-2)/2; srcIdx1.y = (i-1)/2;
-					srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
-					srcIdx2.x = j/2; srcIdx2.y = (i-1)/2;
-					srcIdx2.width = img->width; srcIdx2.bytePP = bytePP;
+				srcIdx1.y = i/2;
+				if(j > 1)
+					srcIdx1.x = (j-1)/2;
+				else
+					srcIdx1.x = 0; 
 
-					desIdx.x = j; desIdx.y = i; 
-					desIdx.width = newWidth; desIdx.bytePP = bytePP;
+				srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
+				srcPix1 = getPixel(&srcIdx1, img->data);
 
-					scaleLiInt(img->data, &srcIdx1, &srcIdx2, newData, &desIdx);
-				}
+				srcIdx2.x = (j+1)/2; srcIdx2.y = i/2;
+				srcIdx2.width = img->width; srcIdx2.bytePP = bytePP;
+				srcPix2 = getPixel(&srcIdx2, img->data);
+
+				desIdx.x = j; desIdx.y = i; 
+				desIdx.width = newWidth; desIdx.bytePP = bytePP;
+				desPix = getPixel(&desIdx, newData);
+
+				scaleLiInt(srcPix1, srcPix2, desPix, &desIdx, newData);
 			}
 			else{
+				/*
+				srcIdx1.x = (j-1)/2;
+				srcIdx2.x = (j+1)/2; 
+				srcIdx3.x = (j-1)/2;
+				srcIdx4.x = (j+1)/2; 
+				if(j == 0){
+					srcIdx1.x = 0;
+					srcIdx3.x = 0;
+				}
+				else if(j == (newWidth-1)){
+					srcIdx2.x = img->width - 1;
+					srcIdx4.x = img->width - 1;
+				}
+
+				srcIdx1.y = (i-1)/2;
+				srcIdx2.y = (i-1)/2;
+				srcIdx3.y = (i+1)/2;
+				srcIdx4.y = (i+1)/2;
+
+				if(i == 0){
+					srcIdx1.y = 0;
+					srcIdx2.y = 0;
+				}
+				else if(i == (newHeight-1)){
+					srcIdx3.y = img->height - 1;
+					srcIdx4.y = img->height - 1; 
+				}
+
+				srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
+				srcIdx2.width = img->width; srcIdx2.bytePP = bytePP;
+				srcIdx3.width = img->width; srcIdx3.bytePP = bytePP;
+				srcIdx4.width = img->width; srcIdx4.bytePP = bytePP;
+
+				srcPix1 = getPixel(&srcIdx1, img->data);
+				srcPix2 = getPixel(&srcIdx2, img->data);
+				srcPix3 = getPixel(&srcIdx3, img->data);
+				srcPix4 = getPixel(&srcIdx4, img->data);
+
+				desIdx.x = j; desIdx.y = i; 
+				desIdx.width = newWidth; desIdx.bytePP = bytePP;
+				desPix = getPixel(&desIdx, newData);
+
+				scaleBiliInt(srcPix1, srcPix2, srcPix3, srcPix4, desPix, &desIdx, newData);
+				*/
 				srcIdx1.x = j/2; srcIdx1.y = i/2;
 				srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
 				desIdx.x = j; desIdx.y = i; 
