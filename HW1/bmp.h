@@ -60,7 +60,6 @@ void bmpDownRes(bmp *img, int scale){
 		img->data[i] = img->data[i] & mask;
 }
 
-
 void bmpScaleUp(bmp *img){
 	printf("Scaling up image\n");
 

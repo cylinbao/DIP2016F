@@ -7,7 +7,6 @@
 #define outNameLen 17
 
 char inNames[inNum][inNameLen] = {"../input1.bmp", "../input2.bmp"};
-//char outNames[inNum][outNum][outNameLen] = {
 char *outNames[inNum][outNum] = {
 		 	"output1_up.bmp", "output1_down.bmp",
 		 	"output2_up.bmp", "output2_down.bmp"
