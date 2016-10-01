@@ -82,26 +82,7 @@ void scaleRep(BYTE *srcData, index *srcIdx, BYTE *desData, index *desIdx){
 	tmpPix = getPixel(srcIdx, srcData);
 	setPixel(tmpPix, desIdx, desData);
 }
-/*
-void scaleLiInt(BYTE *srcData, index *srcIdx1, index *srcIdx2, 
-								BYTE *desData, index *desIdx){
-	pixel *pix1, *pix2; 
 
-	pix1 = getPixel(srcIdx1, srcData);
-	pix2 = getPixel(srcIdx2, srcData);
-
-	pixel *tmpPix = malloc(sizeof(pixel));
-
-	tmpPix->bytePP = pix1->bytePP;
-	tmpPix->b = (pix1->b + pix2->b)/2;
-	tmpPix->g = (pix1->g + pix2->g)/2;
-	tmpPix->r = (pix1->r + pix2->r)/2;
-	if(tmpPix->bytePP > 3)
-		tmpPix->a = (pix1->a + pix2->a)/2;
-
-	setPixel(tmpPix, desIdx, desData);
-}
-*/
 void scaleLiInt(pixel *srcPix1, pixel *srcPix2, pixel *desPix, index *idx, BYTE *data){
 	desPix->bytePP = srcPix1->bytePP;
 	desPix->b = (srcPix1->b + srcPix2->b)/2;
@@ -116,11 +97,11 @@ void scaleLiInt(pixel *srcPix1, pixel *srcPix2, pixel *desPix, index *idx, BYTE 
 void scaleBiliInt(pixel *srcPix1, pixel *srcPix2, pixel *srcPix3, pixel *srcPix4,
 									pixel *desPix, index *idx, BYTE *data){
 	desPix->bytePP = srcPix1->bytePP;
-	desPix->b = (srcPix1->b + srcPix2->b + srcPix3->b + srcPix4->b)/2;
-	desPix->g = (srcPix1->g + srcPix2->g + srcPix3->g + srcPix4->g)/2;
-	desPix->r = (srcPix1->r + srcPix2->r + srcPix3->r + srcPix4->r)/2;
+	desPix->b = (srcPix1->b + srcPix2->b + srcPix3->b + srcPix4->b)/4;
+	desPix->g = (srcPix1->g + srcPix2->g + srcPix3->g + srcPix4->g)/4;
+	desPix->r = (srcPix1->r + srcPix2->r + srcPix3->r + srcPix4->r)/4;
 	if(desPix->bytePP > 3)
-		desPix->a = (srcPix1->a + srcPix2->a + srcPix3->a + srcPix4->a)/2;
+		desPix->a = (srcPix1->a + srcPix2->a + srcPix3->a + srcPix4->a)/4;
 
 	setPixel(desPix, idx, data);
 }
@@ -151,48 +132,7 @@ void bmpScaleUp(bmp *img){
 
 				scaleRep(img->data, &srcIdx1, newData, &desIdx);
 			}
-			else if((j+1)%2 == 0){
-				srcIdx1.x = j/2; 
-				if(i > 1)
-					srcIdx1.y = (i-1)/2;
-				else
-					srcIdx1.y = 0;
-
-				srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
-				srcPix1 = getPixel(&srcIdx1, img->data);
-
-				srcIdx2.x = j/2; srcIdx2.y = (i+1)/2;
-				srcIdx2.width = img->width; srcIdx2.bytePP = bytePP;
-				srcPix2 = getPixel(&srcIdx2, img->data);
-
-				desIdx.x = j; desIdx.y = i; 
-				desIdx.width = newWidth; desIdx.bytePP = bytePP;
-				desPix = getPixel(&desIdx, newData);
-
-				scaleLiInt(srcPix1, srcPix2, desPix, &desIdx, newData);
-			}
-			else if((i+1)%2 == 0){
-				srcIdx1.y = i/2;
-				if(j > 1)
-					srcIdx1.x = (j-1)/2;
-				else
-					srcIdx1.x = 0; 
-
-				srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
-				srcPix1 = getPixel(&srcIdx1, img->data);
-
-				srcIdx2.x = (j+1)/2; srcIdx2.y = i/2;
-				srcIdx2.width = img->width; srcIdx2.bytePP = bytePP;
-				srcPix2 = getPixel(&srcIdx2, img->data);
-
-				desIdx.x = j; desIdx.y = i; 
-				desIdx.width = newWidth; desIdx.bytePP = bytePP;
-				desPix = getPixel(&desIdx, newData);
-
-				scaleLiInt(srcPix1, srcPix2, desPix, &desIdx, newData);
-			}
 			else{
-				/*
 				srcIdx1.x = (j-1)/2;
 				srcIdx2.x = (j+1)/2; 
 				srcIdx3.x = (j-1)/2;
@@ -235,13 +175,6 @@ void bmpScaleUp(bmp *img){
 				desPix = getPixel(&desIdx, newData);
 
 				scaleBiliInt(srcPix1, srcPix2, srcPix3, srcPix4, desPix, &desIdx, newData);
-				*/
-				srcIdx1.x = j/2; srcIdx1.y = i/2;
-				srcIdx1.width = img->width; srcIdx1.bytePP = bytePP;
-				desIdx.x = j; desIdx.y = i; 
-				desIdx.width = newWidth; desIdx.bytePP = bytePP;
-
-				scaleRep(img->data, &srcIdx1, newData, &desIdx);
 			}
 		}
 	}
@@ -257,14 +190,14 @@ void bmpScaleUp(bmp *img){
 void bmpScaleDown(bmp *img){
 	printf("Scaling down image\n");
 
-	int i, j, k, bytePP; 
+	int i, j, k, bytePP;
 	UINT32 newDataSize = img->dataSize/4;
 	UINT32 newWidth = img->width/2;
 	UINT32 newHeight = img->height/2;
 	index oriIdx, newIdx;
 
 	bytePP = img->bitPerPixel/8;
-	printf("bytePP = %d\n", bytePP);
+
 	BYTE *newData = malloc(newDataSize);
 
 	for(i = 0; i < newHeight; i++){
@@ -323,15 +256,15 @@ void bmpRead(char *filename, bmp *img){
 	fread(&img->offset, 1, 4, inFile);
 	fread(&img->headerSize, 1, 4, inFile); assert(img->headerSize == 40);
 	fread(&img->width, 1, 4, inFile);
-	printf("width is %d\n", img->width);
+	//printf("width is %d\n", img->width);
 	fread(&img->height, 1, 4, inFile);
-	printf("height is %d\n", img->height);
+	//printf("height is %d\n", img->height);
 	fread(&img->planes, 1, 2, inFile);
 	fread(&img->bitPerPixel, 1, 2, inFile); 
-	printf("bitPerPixel is %d\n", img->bitPerPixel);
+	//printf("bitPerPixel is %d\n", img->bitPerPixel);
 	fread(&img->compression, 1, 4, inFile); assert(img->compression == 0);
 	fread(&img->dataSize, 1, 4, inFile);
-	printf("dataSize is %d\n", img->dataSize);
+	//printf("dataSize is %d\n", img->dataSize);
 	fread(&img->hResolution, 1, 4, inFile);
 	fread(&img->vResolution, 1, 4, inFile);
 	fread(&img->usedColors, 1, 4, inFile);
@@ -340,6 +273,25 @@ void bmpRead(char *filename, bmp *img){
 	img->data = malloc(img->dataSize);
 	fseek(inFile, img->offset, SEEK_SET);
 	fread(img->data, 1, img->dataSize, inFile);
+
+	int bytePP = img->bitPerPixel / 8;
+	int i, j;
+	if(bytePP == 3){
+		img->bitPerPixel = 32;
+		img->dataSize = img->width * img->height * 4;
+		BYTE *newData = malloc(img->dataSize);
+
+		for(i = 0; i < img->height; i++){
+			for(j = 0; j < img->width; j++){
+				newData[(i*img->width+j)*4] = img->data[(i*img->width+j)*3];
+				newData[(i*img->width+j)*4 + 1] = img->data[(i*img->width+j)*3 + 1];
+				newData[(i*img->width+j)*4 + 2] = img->data[(i*img->width+j)*3 + 2];
+				newData[(i*img->width+j)*4 + 3] = 0;
+			}
+		}
+		free(img->data);
+		img->data = newData;
+	}
 
 	fclose(inFile);
 
