@@ -14,17 +14,29 @@ char *outNames[inNum][outNum] = {
 
 bmp imgs[inNum][outNum];
 
-int main()
+int main(int argc, char *argv[])
 {
 	int i, j;
 
-	for(i = 0; i < inNum; i++){
-		bmpRead(inNames[i], &imgs[i][0]);
-		bmpRead(inNames[i], &imgs[i][1]);
-		bmpScaleUp(&imgs[i][0]);
-		bmpScaleDown(&imgs[i][1]);
-		bmpWrite(outNames[i][0], &imgs[i][0]);
-		bmpWrite(outNames[i][1], &imgs[i][1]);
+	printf("argc = %d\n", argc);
+
+	if(argc == 1){
+		for(i = 0; i < inNum; i++){
+			bmpRead(inNames[i], &imgs[i][0]);
+			bmpRead(inNames[i], &imgs[i][1]);
+			bmpScaleUp(&imgs[i][0]);
+			bmpScaleDown(&imgs[i][1]);
+			bmpWrite(outNames[i][0], &imgs[i][0]);
+			bmpWrite(outNames[i][1], &imgs[i][1]);
+		}
+	}
+	else if(argc == 2){
+		bmpRead(argv[1], &imgs[0][0]);
+		bmpRead(argv[1], &imgs[0][1]);
+		bmpScaleUp(&imgs[0][0]);
+		bmpScaleDown(&imgs[0][1]);
+		bmpWrite("scalingDemo_up.bmp", &imgs[0][0]);
+		bmpWrite("scalingDemo_down.bmp", &imgs[0][1]);
 	}
 
 	return 0;
