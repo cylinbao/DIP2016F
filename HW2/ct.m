@@ -1,6 +1,6 @@
 clear;
 
-hgamma = vision.GammaCorrector(2.0,'Correction','De-gamma');
+hgamma = vision.GammaCorrector(2.2,'Correction','De-gamma');
  
 rgb = imread('input2.bmp');
 rgb = step(hgamma, rgb);
@@ -41,7 +41,7 @@ img_ct = Lab2RGB(lab);
 %img_ct = Lab2RGB2(lab);
 %img_ct = lab2rgb(lab);
 
-hgamma = vision.GammaCorrector(2.0,'Correction','Gamma');
+hgamma = vision.GammaCorrector(2.2,'Correction','Gamma');
 img_ct = step(hgamma, img_ct);
 
 imwrite(img_ct, 'input2_ct.bmp');
