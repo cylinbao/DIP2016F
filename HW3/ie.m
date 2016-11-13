@@ -1,17 +1,18 @@
 clear;
 
-inImg = imread('input3.bmp');
+rgb = imread('input3.bmp');
+lab = rgb2lab(rgb);
 sigma = 10;
 
-r = inImg(:,:,1);
-g = inImg(:,:,2);
-b = inImg(:,:,3);
+l = lab(:,:,1);
 
-outImg(:,:,1) = homoFilt(r, sigma);
-outImg(:,:,2) = homoFilt(g, sigma);
-outImg(:,:,3) = homoFilt(b, sigma);
+l = homoFilt(l, sigma);
+
+lab(:,:,1) = l;
+
+outrgb = lab2rgb(lab);
 
 subplot(121)
-imshow(inImg);
+imshow(rgb);
 subplot(122)
-imshow(outImg);
+imshow(outrgb);
