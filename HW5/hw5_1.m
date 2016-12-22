@@ -8,9 +8,11 @@ img = imread('input1.bmp');
 
 % Do some proccessing on [A H V D] here
 D1(:) = 0;
-D2(:) = 0;
-D3(:) = 0;
+V1(:) = 0;
+H1(:) = 0;
 
 dImg3 = idwt2(A3,H3,V3,D3,'haar');
 dImg2 = idwt2(dImg3,H2,V2,D2,'haar');
 dImg1 = idwt2(dImg2,H1,V1,D1,'haar');
+
+imwrite(dImg1,'output1.bmp');
