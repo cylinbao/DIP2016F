@@ -10,16 +10,27 @@ b = img(:,:,3);
 % figure
 % imshow([A H;V D],[]);
 
-S = sqrt(H.^2 + V.^2);
-gS = rgb2gray(S);
-bS = edge(gS,'canny');
+gH = rgb2gray(H);
+gV = rgb2gray(V);
+
+lH = graythresh(gH);
+bH = im2bw(gH,lH);
+lV = graythresh(gV);
+bV = im2bw(gV,lV);
+
 % figure
 % subplot(121)
-% imshow(gS,[]);
+% imshow(gH,[]);
 % subplot(122)
-% imshow(bS,[]);
+% imshow(bH,[]);
+% figure
+% subplot(121)
+% imshow(gV,[]);
+% subplot(122)
+% imshow(bV,[]);
 
-L = imresize(bS,2);
+L = bH | bV;
+L = imresize(L,2);
 
 r(L) = 255; g(L) = 0; b(L) = 0;
 
